@@ -1,0 +1,16 @@
+todo.txt
+
+1. Products (physical)
+    --> Single Product (detail view)
+        --> social sharing buttons
+    --> List Product (list view)
+    --> Inventory Control + viewable
+    --> Search Product
+
+2. Checkout
+    --> Cart (shopping cart)
+    --> Auth Users & Guest User (non-auth)
+    --> Shipping & Billing Address
+
+3. Payment
+    --> Integration with BrainTree 
