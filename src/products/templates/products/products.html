@@ -1,0 +1,9 @@
+    <div class="row">
+    {% for product in object_list %}
+           <div {% if col_four %} class="col-sm-4" {% else %} class="col-sm-2" {% endif %} >
+                {% include "products/product_thumbnail.html" with product=product price="True"%}
+           </div>
+        {% cycle '' '' '' '' '' '</div><div class="row">' %}
+
+    {% endfor %}
+        </div>

@@ -1,19 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
         <h1>
-            Product ListView
+            All Products <small><a href="{% url "category_list" %}">Categories</a> </small>
         </h1>
-    {% for object in object_list %}
-        <div>
-            <a href="{{ object.get_absolute_url }}">
-                {{ object.title }}
-            </a>
-
-            <br>
-            {{ object.description }}
-            <br>
-            {{ object.price }}
-        </div>
-        <hr>
-    {% endfor %}
+        {% include "products/products.html" with object_list=object_list%}
 {% endblock %}

@@ -1,3 +1,17 @@
 .text-align-center {
 	text-align: center;
 }
+
+.sale-price {
+
+}
+
+.og-price {
+	color: #ff0707;
+	text-decoration: line-through;
+}
+
+.fa-nav-bar-cart {
+	font-size: 25px;
+	vertical-align: middle;
+}

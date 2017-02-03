@@ -26,11 +26,22 @@
   <body>
   {% include 'navbar.html' %}
 
-{% block jumbotron %}
+
+      {% block jumbotron %}
           
             {% endblock %}
     <div class="container">
-            
+
+                {% if messages %}
+
+
+                    {% for message in messages %}
+                        <div class="alert alert-success text-center">{{ message }}
+                        </div>
+                    {% endfor %}
+
+                  {% endif %}
+
 
           
             {% block content %}
@@ -41,7 +52,13 @@
     </div> <!-- /container -->
 
     {% include "javascript.html" %}
-    
+
+  <script>
+      $(document).ready(function(){
+          {% block jquery %}
+          {% endblock %}
+      });
+  </script>
     
   </body>
 </html>
