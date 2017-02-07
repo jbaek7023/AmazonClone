@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+<script>
+   {% block jquery %}
+            function showFlashMessage(message_str){
+                var template = "{% include 'alert.html' with message_str='"+ message_str +"'%}";
+                $("body").append(template);
+                $('.alert-position').fadeIn();
+                setTimeout(function(){
+                    $('.alert-position').fadeOut();
+                }, 1800);
+            }
+
+
+
+    $(".item-qty").change(function(){
+        event.preventDefault();
+                var item = $(this).prev("input[type='hidden']").val()
+                var qty = $(this).val()
+                var data = {
+                    item: item,
+                    qty: qty
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'carts' %}",
+                    data: data,
+                    success: function(data) {
+                        if(data.deleted) {
+                            message = "item deleted"
+                            changeCharge(data, item);
+                            $("#row_id_" + item).fadeOut()
+                        } else if(data.item_added) {
+                            changeCharge(data, item);
+                            message = "Item Added"
+                        }
+                        else {
+                            changeCharge(data, item);
+                            message= "Item Updated"
+
+                        }
+                        updateCartItemCount();
+                        showFlashMessage(message);
+                    },
+                    error: function(response, error){
+                        console.log(response);
+                    }
+                })
+    })
+
+
+       function changeCharge(data, item){
+                $("#col-line-total-"+item).text(data.line_total);
+                $("#subtotal").text("Subtotal: "+data.sub_total);
+                $("#taxtotal").text("Total Tax(estimated): "+data.tax_total);
+                $("#total").text("Total: "+data.to_of_total);
+            }
+   {% endblock %}
+</script>
+
+
+    {% block content %}
+        {% if object.cartitem_set.count < 1 %}
+            {% include 'empty_cart.html' %}
+        {% else %}
+            {% for item in object.cartitem_set.all %}
+                <div id="row_id_{{ item.item.id }}" class="row">
+                    <form method="GET" action="">
+                        <div class="col-sm-3">{{ item.item.get_title }}</div>
+                        <div class="col-sm-3">
+                            <input type="hidden" name="item" value="{{ item.item.id }}">
+                            <input type="number" class="item-qty" name="qty" value="{{ item.quantity }}">
+                            <input type="submit" class="btn btn-link hidden" value="Update item">
+                        </div>
+                        <div id="col-line-total-{{ item.item.id }}" class="col-sm-3 text-right">{{ item.line_item_total }}</div>
+                        <div class="col-sm-3 text-right"><a href="{{ item.remove }}">X </a></div>
+                    </form>
+                </div>
+            {% endfor %}
+            <hr>
+            <div class="row">
+                <div id="subtotal" class="col-sm-12 text-right">
+                    Subtotal: {{ object.sub_total }}
+                </div>
+                <div id="taxtotal" class="col-sm-12 text-right">
+                    Total Tax(estimated): {{ object.tax_total }}
+                </div>
+                <div id="total" class="col-sm-12 text-right">
+                    Total: {{ object.total }}
+                </div>
+
+            </div>
+        {% endif %}
+    {% endblock %}

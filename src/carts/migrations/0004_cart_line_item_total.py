@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0006_productfeatured_make_image_background'),
+        ('carts', '0003_auto_20170203_1245'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productfeatured',
-            name='text_css_color',
-            field=models.CharField(null=True, max_length=120, blank=True),
+            model_name='cart',
+            name='line_item_total',
+            field=models.DecimalField(max_digits=10, decimal_places=2, default=19.99),
         ),
     ]

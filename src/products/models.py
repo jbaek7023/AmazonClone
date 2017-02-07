@@ -123,6 +123,15 @@ class Variation(models.Model):
     def get_absolute_url(self):
         return self.product.get_absolute_url()
 
+    def add_to_cart(self):
+        return "{0}?item={1}&qty=1".format(reverse("carts"), self.id)
+
+    def remove_from_cart(self):
+        return "{0}?item={1}&qty=1&delete=True".format(reverse("carts"), self.id)
+
+    def get_title(self):
+        return "{0} - {1}".format(self.product.title, self.title)
+
 def product_saved_receiver(sender, instance, created, *args, **kwargs):
     print(sender)
     print(instance)

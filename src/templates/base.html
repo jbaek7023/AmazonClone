@@ -11,46 +11,33 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>{% block head_title %}MVP Landing{% endblock %}</title>
-
+    <title>{% block head_title %}Welcome to Amazon Clone{% endblock %}</title>
     {% include 'head_css.html' %}
-
       <style>
       {% block style %}{% endblock %}
       </style>
-
-
-
   </head>
 
   <body>
+  <!--Navbar-->
   {% include 'navbar.html' %}
-
-
-      {% block jumbotron %}
-          
+  <!--Jumbotron-->
+  {% block jumbotron %}
             {% endblock %}
+  <!--Begin Container-->
     <div class="container">
-
                 {% if messages %}
-
-
                     {% for message in messages %}
                         <div class="alert alert-success text-center">{{ message }}
                         </div>
                     {% endfor %}
 
                   {% endif %}
-
-
-          
+    <!--Begin content-->
             {% block content %}
-
             {% endblock %}
-              
-
-    </div> <!-- /container -->
-
+    </div> <!-- end of container -->
+  <!--script tags-->
     {% include "javascript.html" %}
 
   <script>
