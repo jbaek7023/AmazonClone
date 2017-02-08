@@ -37,7 +37,7 @@
                         </span>
                         <i class="fa fa-shopping-cart fa-nav-bar-cart"></i> </a></li>
                     {% if request.user.is_authenticated %}
-                        <li><a href="">Hello, {{ request.user.username }}</a></li>
+                        <li><a href="{% url 'orders' %}">{{ request.user.username }}Orders</a></li>
                     <li><a href="{% url 'auth_logout' %}">Logout</a></li>
 
                     {% else %}

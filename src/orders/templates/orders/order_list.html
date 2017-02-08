@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
 
 {% block  content%}
-    {% for object in object_list %}
-        <p>{{ object.id }} - {{ object.cart.items.all }}</p>
+
+    {% if not object_list.count >= 0 %}
+        <div class="text-center">
+        <h1>You do not currently have orders </h1>
+        </div>
+    {% else %}
+    <div class="col-sm-6 col-sm-offset-3 text-center">
+        <h1>Your Orders</h1>
+    <br>
+        {% for object in object_list %}
+        <div class="row border-bottom-0 lead">
+
+            <div class="col-sm-6 text-lef">
+                <a href="{{ object.get_absolute_url }}">Order #{{ object.id }}</a>
+            </div>
+            <div class="col-sm-6 text-right">Item Count : {{ object.cart.items.count }}</div>
+        </div><hr>
     {% endfor %}
+
+    </div>
+    {% endif %}
+
 {% endblock %}

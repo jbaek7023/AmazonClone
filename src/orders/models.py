@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import pre_save
 
@@ -57,6 +58,13 @@ class Order(models.Model):
     def mark_completed(self):
         self.status = "completed"
         self.save()
+
+    def get_absolute_url(self):
+        return reverse("order_detail", kwargs={"pk":self.pk})
+
+    class Meta:
+        # Order by id
+        ordering = ['-id']
 
 def order_pre_save(sender, instance,*args, **kwargs):
     shipping_total_price = instance.shipping_total_price
