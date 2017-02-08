@@ -38,30 +38,25 @@
 
         {% endif %}
     {% else %}
-        <div class="row">
-            <div class="col-sm-4 col-sm-offset-4 text-center">
-                <p class="lead">You Order</p>
-            </div>
-            <div class="col-sm-4 col-sm-offset-4 text-center"><ul>
-            {{ order.cart.items.count }} item(s) :<br>
-                {% for item in order.cart.cartitem_set.all %}
-                    <strong>
-                        {{ item.item.get_title }}
-                    </strong><br>
-                {% endfor %}
+<div class="row text-center">
+{% include "orders/order_summary_short.html" with order=order%}
 
-            </ul>
-            <hr></div>
-            <div class="col-sm-4 col-sm-offset-4 text-center">Cart Subtotal : {{ order.cart.sub_total }}
-            <hr></div>
+        <div class="col-sm-4 col-sm-offset-4 text-center">
+            <p><b>Shipping to</b></p>
+            <p>{{ order.shipping_address.get_address }}</p>
+            <p><b>Billing from</b></p>
+            <p>{{ order.billing_address.get_address }}</p>
+            <br>
+            <a href="{% url "order_address" %}">Change Address</a>
+            <form method="POST" action="{% url 'checkout_final' %}">
+                {% csrf_token %}
+                <input type="hidden" name="payment_token" value="ABC">
+                <p><b><button type="submit">Complete Order</button></b></p>
+            </form>
 
-            <div class="col-sm-4 col-sm-offset-4 text-center">Tax : {{ order.cart.tax_total }}<hr></div>
+        </div>
 
-            <div class="col-sm-4 col-sm-offset-4 text-center">Cart Total: {{ order.cart.total }}<hr></div>
 
-            <div class="col-sm-4 col-sm-offset-4 text-center">Shipping : {{ order.shipping_total_price }} <hr></div>
-
-            <div class="col-sm-4 col-sm-offset-4 text-center">Total : {{ order.order_total }}</div>
 
         </div>
 

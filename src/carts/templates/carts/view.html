@@ -14,38 +14,38 @@
 
     $(".item-qty").change(function(){
         event.preventDefault();
-                var item = $(this).prev("input[type='hidden']").val()
-                var qty = $(this).val()
-                var data = {
-                    item: item,
-                    qty: qty
+        var item = $(this).prev("input[type='hidden']").val()
+        var qty = $(this).val()
+        var data = {
+            item: item,
+            qty: qty
+        }
+        $.ajax({
+            type: "GET",
+            url: "{% url 'carts' %}",
+            data: data,
+            success: function(data) {
+                if(data.deleted) {
+                    message = "item deleted"
+                    changeCharge(data, item);
+                    $("#row_id_" + item).fadeOut()
+                } else if(data.item_added) {
+                    changeCharge(data, item);
+                    message = "Item Added"
                 }
-                $.ajax({
-                    type: "GET",
-                    url: "{% url 'carts' %}",
-                    data: data,
-                    success: function(data) {
-                        if(data.deleted) {
-                            message = "item deleted"
-                            changeCharge(data, item);
-                            $("#row_id_" + item).fadeOut()
-                        } else if(data.item_added) {
-                            changeCharge(data, item);
-                            message = "Item Added"
-                        }
-                        else {
-                            changeCharge(data, item);
-                            message= "Item Updated"
+                else {
+                    changeCharge(data, item);
+                    message= "Item Updated"
 
-                        }
-                        updateCartItemCount();
-                        showFlashMessage(message);
-                    },
-                    error: function(response, error){
-                        console.log(response);
-                    }
-                })
-    })
+                }
+                updateCartItemCount();
+                showFlashMessage(message);
+            },
+            error: function(response, error){
+                console.log(response);
+            }
+        })
+    });
 
 
        function changeCharge(data, item){
@@ -59,9 +59,13 @@
 
 
     {% block content %}
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2">
+
         {% if object.cartitem_set.count < 1 %}
             {% include 'empty_cart.html' %}
         {% else %}
+            <h1>Your Cart</h1>
             {% for item in object.cartitem_set.all %}
                 <div id="row_id_{{ item.item.id }}" class="row">
                     <form method="GET" action="">
@@ -87,7 +91,13 @@
                 <div id="total" class="col-sm-12 text-right">
                     Total: {{ object.total }}
                 </div>
-
+                <div id="total" class="col-sm-12 text-right">
+                    <a class="btn btn-warning" href="{% url 'checkout' %}">Checkout</a>
+                </div>
+            </div>
             </div>
         {% endif %}
+        </div>
+
+
     {% endblock %}

@@ -19,9 +19,6 @@ class Cart(models.Model):
     tax_total = models.DecimalField(max_digits=50, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=50, decimal_places=2, default=0)
 
-    #discount
-    #shipping
-
     def __str__(self):
         return str(self.user)
 

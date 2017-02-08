@@ -32,7 +32,15 @@ class UserAddress(models.Model):
     zipcode = models.CharField(max_length=120)
 
     def __str__(self):
-        return self.user.email
+        return "{0}, {1}, {2}, {3}".format(self.street, self.city, self.country, self.zipcode)
+
+    def get_address(self):
+        return "{0}, {1}, {2}, {3}".format(self.street, self.city, self.country, self.zipcode)
+
+ORDER_STATUS_CHOICES = (
+    ('created', 'Created'),
+    ('completed', 'Completed')
+)
 
 class Order(models.Model):
     cart = models.ForeignKey(Cart)
@@ -41,9 +49,15 @@ class Order(models.Model):
     billing_address=models.ForeignKey(UserAddress, related_name='shipping_address', null=True)
     shipping_total_price = models.DecimalField(decimal_places=2, max_digits=50, default=5.99)
     order_total = models.DecimalField(decimal_places=2, max_digits=50)
+    status = models.CharField(max_length=120, choices=ORDER_STATUS_CHOICES, default='created')
 
     def __str__(self):
         return str(self.cart.id)
+
+    def mark_completed(self):
+        self.status = "completed"
+        self.save()
+
 def order_pre_save(sender, instance,*args, **kwargs):
     shipping_total_price = instance.shipping_total_price
     cart_total = instance.cart.total

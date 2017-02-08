@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 from django.http import Http404, JsonResponse
@@ -5,16 +6,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.views.generic import View
-
+from  django.views.generic.list import ListView
 
 # Create your views here.
 from orders.forms import GuestCheckoutForm
 from orders.models import UserCheckout, Order, UserAddress
 from products.models import Variation
 from carts.models import Cart, CartItem
-
+from orders.mixins import CartOrderMixin
 from django.views.generic.edit import FormMixin
-
 
 
 class ItemCountView(View):
@@ -104,7 +104,6 @@ class CartView(SingleObjectMixin, View):
                 flash_message = "Quantity has been updated successfully"
                 cart_item.quantity = quantity
                 cart_item.save()
-                print("not delete_item: ")
                 delete_item = False
 
             if not request.is_ajax:
@@ -134,7 +133,6 @@ class CartView(SingleObjectMixin, View):
                 to_of_total = None
 
             quantity_cart_item = request.GET.get("qty", 1)
-            print("qty_item"+quantity_cart_item)
 
 
             data = {
@@ -157,36 +155,21 @@ class CartView(SingleObjectMixin, View):
 
         return render(request, template, context)
 
-class CheckOutView(FormMixin, DetailView):
+
+
+class CheckOutView(CartOrderMixin, FormMixin, DetailView):
     model = Cart
     template_name =  "carts/checkout_view.html"
     form_class = GuestCheckoutForm
 
-
     def get_object(self, *args, **kwargs):
-        cart_id = self.request.session.get("cart_id")
+        cart = self.get_cart()
 
         # if session doesn't have Cart, create the Cart AND set the session [ "cart_id" ]
-        if cart_id == None:
-            cart = Cart()
-            cart.save()
-            cart_id = cart.id
-            self.request.session["cart_id"] = cart.id
+        if cart == None:
+            return None
         # Get the Cart. new Cart or existing Cart
-        cart = Cart.objects.get(id=cart_id)
         return cart
-
-    def get_order(self, *args, **kwargs):
-        cart = self.get_object()
-        print(cart)
-        new_order_id = self.request.session.get("order_id")
-        if new_order_id == None:
-            new_order = Order.objects.create(cart=cart)
-            self.request.session["order_id"] = new_order.id
-        else:
-            new_order = Order.objects.get(id=new_order_id)
-        return new_order
-
 
     def get_context_data(self, *args, **kwargs):
         context = super(CheckOutView, self).get_context_data(*args, **kwargs)
@@ -195,26 +178,27 @@ class CheckOutView(FormMixin, DetailView):
         user_checkout_id = self.request.session.get("user_checkout_id")
 
         user_can_continue = False
-        # if user is not authenticated, generate login / guest form
-        if not self.request.user.is_authenticated() or user_checkout_id == None:
-            context["login_form"] = AuthenticationForm()
-            context["next_url"] = self.request.build_absolute_uri()
-
-        #if user is not authenticated, continue to checkout
-        elif self.request.user.is_authenticated() or user_checkout_id != None:
-            user_can_continue = True
-        else:
-            pass
 
         if self.request.user.is_authenticated():
+            user_can_continue=True
             user_checkout, created = UserCheckout.objects.get_or_create(email=self.request.user.email)
             user_checkout.user = self.request.user
             user_checkout.save()
             self.request.session["user_checkout_id"] = user_checkout.id
+        elif not self.request.user.is_authenticated() and user_checkout_id == None:
+            context["login_form"] = AuthenticationForm()
+            context["next_url"] = self.request.build_absolute_uri()
+        else:
+            pass
+
+        if user_checkout_id !=None:
+            user_can_continue = True
+
+        context["order"] = self.get_order()
 
         context["user_can_continue"] = user_can_continue
         context["form"] = self.get_form()
-        context["order"] = self.get_order()
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -226,7 +210,6 @@ class CheckOutView(FormMixin, DetailView):
             request.session["user_checkout_id"] = user_checkout.id
             return self.form_valid(form)
         else:
-            print(form.is_valid())
             return self.form_invalid(form)
 
     def get_success_url(self):
@@ -236,6 +219,9 @@ class CheckOutView(FormMixin, DetailView):
         get_data = super(CheckOutView, self).get(request, *args, **kwargs)
         # Create order automatically
         cart = self.get_object()
+        if cart == None:
+            print("in the loop")
+            return redirect("carts")
         new_order = self.get_order()
 
 
@@ -243,21 +229,26 @@ class CheckOutView(FormMixin, DetailView):
         if user_checkout_id !=None:
             user_checkout = UserCheckout.objects.get(id = user_checkout_id)
 
-            billing_address_id = request.session.get("billing_address_id")
-            shipping_address_id = request.session.get("shipping_address_id")
-
-            if billing_address_id == None or shipping_address_id == None:
+            if new_order.billing_address_id == None or new_order.shipping_address_id == None:
                 return redirect("order_address") # redirect to the cart
-            else:
-                billing_address = UserAddress.objects.get(id=billing_address_id)
-                shipping_address = UserAddress.objects.get(id=shipping_address_id)
 
-            new_order.cart = cart
+
             new_order.user = user_checkout
-            new_order.billing_address = billing_address
-            new_order.shipping_address = shipping_address
             new_order.save()
         #done creating order
         return get_data
 
+class CheckoutFinalView(CartOrderMixin, View):
+    def post(self, request, *args, **kwargs):
+        order = self.get_order()
+        if request.POST.get("payment_token")=="ABC":
+            order.mark_completed()
+            messages.success(request, "Thank you for your order")
 
+            #clean every session
+            del request.session["cart_id"]
+            del request.session["order_id"]
+        return redirect("order_detail", pk=order.id)
+
+    def get(self, request, *args, **kwargs):
+        return redirect("checkout")
