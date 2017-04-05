@@ -1,36 +1,15 @@
 # Amazon Clone
 
 AmazonClone is modeled of Amazon (www.amazon.com) E-commerce website. 
--full demo
+
+Languages & Frameworks: Django, JS/jQuery, HTML/CSS
+
+## Key Features
+1. Checkout Flow
 ![full](projvideo/full-demo.gif)
 
-## Features
--Main Page
-![main](projvideo/main.gif)
-
--Category Page
-![cat](projvideo/category.gif)
-
--Item Page
-![item](projvideo/item.gif)
-sale price, price
-add to cart 
-add more in same category 
-
--Cart Page
-![cart](projvideo/cart.gif)
-edit delete Ajax 
-Checkout 
-total tax
-
-admin 
-![admin](projvideo/admin.gif)
--
-
-Checkout Flow 
-todo ... -> style. 
-
-authentication... 전체 업그레이드. 
+2. Cart Page
+![full](projvideo/cart.gif)
 
 ## Setup & Run
 1. Open the project directory and go to 'src' folder
