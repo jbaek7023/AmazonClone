@@ -5,7 +5,7 @@ body {
 .navbar-static-top {
   margin-bottom: 19px;
   background-color: #eea236;
-  border-color: #1A5F23;
+  border-color: #eea236;
 }
 
 .navbar-default .navbar-brand {
@@ -25,9 +25,9 @@ body {
 }
 
 .navbar-toggle:hover {
-	background-color: #1A5F23 !important;
+	background-color: #eea236 !important;
 }
 
 .navbar-toggle {
-	background-color: #0E3D14 !important;
+	background-color: #eea236 !important;
 }
